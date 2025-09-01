@@ -15,4 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->withProviders([
+        App\Providers\MediaServiceProvider::class,   // ← add this
+    ])
+    ->withCommands([
+        App\Console\Commands\UploadMedia::class,  // ← and these
+        App\Console\Commands\SearchMedia::class,
+        App\Console\Commands\EnrichMedia::class,
+    ])->create();
