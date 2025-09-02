@@ -15,9 +15,10 @@ class UploadMedia extends Command
         {title : Title}
         {description : Description}
         {source_url : Valid URL}
-        {--meta=* : key=value pairs (repeatable)}';
+        {--meta=* : key=value pairs (repeatable)}
+        {--enrich : Run metadata enrichment before saving}';
 
-    protected $description = 'Simulate a media upload (create + validate + enrich + store)';
+    protected $description = 'Simulate a media upload (create + validate + optional enrich + store)';
 
     public function handle(MediaService $service): int
     {
@@ -46,7 +47,9 @@ class UploadMedia extends Command
                 $metadata
             );
 
-            $stored = $service->store($media);
+            $enrich = (bool) $this->option('enrich');
+
+            $stored = $service->store($media,$enrich);
             $this->line(json_encode($stored, JSON_PRETTY_PRINT));
             return self::SUCCESS;
         } catch (\Throwable $e) {

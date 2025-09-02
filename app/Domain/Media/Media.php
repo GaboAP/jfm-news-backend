@@ -53,14 +53,35 @@ final class Media implements \JsonSerializable
     }
 
     // -------- Getters (no setters to keep immutability)
-    public function id(): MediaId { return $this->id; }
-    public function type(): MediaType { return $this->type; }
-    public function title(): string { return $this->title; }
-    public function description(): string { return $this->description; }
-    public function sourceUrl(): Url { return $this->sourceUrl; }
-    public function uploadedAt(): DateTimeImmutable { return $this->uploadedAt; }
+    public function id(): MediaId
+    {
+        return $this->id;
+    }
+    public function type(): MediaType
+    {
+        return $this->type;
+    }
+    public function title(): string
+    {
+        return $this->title;
+    }
+    public function description(): string
+    {
+        return $this->description;
+    }
+    public function sourceUrl(): Url
+    {
+        return $this->sourceUrl;
+    }
+    public function uploadedAt(): DateTimeImmutable
+    {
+        return $this->uploadedAt;
+    }
     /** @return array<string,mixed> */
-    public function metadata(): array { return $this->metadata; }
+    public function metadata(): array
+    {
+        return $this->metadata;
+    }
 
     // -------- "Withers" to evolve state immutably
     public function withTitle(string $title): self
@@ -95,5 +116,17 @@ final class Media implements \JsonSerializable
             'uploaded_at' => $this->uploadedAt()->format(DATE_ATOM),
             'metadata'    => $this->metadata(),
         ];
+    }
+
+    public static function reconstitute(
+        MediaId $id,
+        MediaType $type,
+        string $title,
+        string $description,
+        Url $sourceUrl,
+        DateTimeImmutable $uploadedAt,
+        array $metadata = []
+    ): self {
+        return new self($id, $type, trim($title), trim($description), $sourceUrl, $uploadedAt, $metadata);
     }
 }

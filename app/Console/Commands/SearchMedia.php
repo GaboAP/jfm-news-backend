@@ -11,7 +11,9 @@ class SearchMedia extends Command
 {
 protected $signature = 'media:search
         {--type= : image|video|audio|graph|file}
-        {--title= : substring match}';
+        {--title= : substring match}
+        {--with-meta : Includes metadata in output}
+        {--json : Output full JSON records}';
 
     protected $description = 'Search media by type and/or title';
 
@@ -29,6 +31,7 @@ protected $signature = 'media:search
             }
         }
 
+
         $criteria = new SearchCriteria(
             type: $type,
             titleContains: $this->option('title') ?: null
@@ -40,6 +43,16 @@ protected $signature = 'media:search
             return self::SUCCESS;
         }
 
+        // Full JSON mode (includes metadata, dates, etc.)
+        if ($this->option('json')) {
+            $payload = array_map(fn($m) => $m->jsonSerialize(), $results);
+            $this->line(json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            return self::SUCCESS;
+        }
+
+        // Default human-readable mode
+        $withMeta = (bool) $this->option('with-meta');
+
         foreach ($results as $m) {
             $this->line(sprintf(
                 '[%s] %s | %s | %s',
@@ -48,6 +61,15 @@ protected $signature = 'media:search
                 $m->title(),
                 (string) $m->sourceUrl()
             ));
+
+            if ($withMeta) {
+                $meta = $m->metadata();
+                if (!empty($meta)) {
+                    $this->line('  meta: ' . json_encode($meta, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
+                } else {
+                    $this->line('  meta: {}');
+                }
+            }
         }
         return self::SUCCESS;
     }

@@ -16,10 +16,14 @@ final class MediaService
         private MediaMetadataServiceInterface $metadata,
     ) {}
 
-    public function store(Media $media): Media
+    public function store(Media $media, bool $enrich = false): Media
     {
         $this->validator->validate($media);
-        $media = $this->metadata->enrich($media);
+
+        if ($enrich) {
+            $media = $this->metadata->enrich($media);
+        }
+
         $this->repo->save($media);
         return $media;
     }
