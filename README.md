@@ -1,61 +1,130 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Modular CMS Backend Challenge
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This project simulates a modular PHP backend component for a custom CMS using Laravel 12.  
+It focuses on Media Management and Article Integration with clear separation of concerns, PSR standards, and testability.
 
-## About Laravel
+------------------------------------
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Requirements
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- PHP 8.2+
+- Composer
+- Laravel 12
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+------------------------------------
 
-## Learning Laravel
+## Project Structure (key parts)
+app/
+    Domain/
+        Media/ # Media entity, service, contracts, DTOs
+        Article/ # Article entity, attachments, resolver, contracts
+        Shared/ # Shared value objects (UUIDs, URL)
+    Infrastructure/
+        Media/Repository/ # InMemory + File-based media repositories
+        Article/Repository/ # InMemory + File-based article repositories
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Providers/ # Service providers for DI bindings
+Console/Commands/ # Artisan commands (media + article)
+config/
+    article.php # Article repository config (memory | file)
+    media.php # Media repository config (memory | file)
+tests/Unit/ # Unit tests for media and article
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+------------------------------------
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+Once The project is cloned, run composer install and wait for the files to be generated.
+Afterwards, copy the .env.example as is and remove the .env, nothing should be changed unless wanting to move from memory repos to file repos
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+------------------------------------
 
-### Premium Partners
+## Configuration
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Repositories can be memory-backed (default, non-persistant) or file-backed for demo persistence.
 
-## Contributing
+MEDIA_REPOSITORY=memory   # memory | file
+MEDIA_FILE_DISK=local     # only used when MEDIA_REPOSITORY=file
+MEDIA_FILE_PATH=media_store.json #only used when MEDIA_REPOSITORY=file
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+ARTICLE_REPOSITORY=memory # memory | file
+ARTICLE_FILE_DISK=local   # only used when ARTICLE_REPOSITORY=file
+ARTICLE_FILE_PATH=articles_store.json # only used when ARTICLE_REPOSITORY=file
 
-## Code of Conduct
+------------------------------------
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Notes:
 
-## Security Vulnerabilities
+memory: Data exists only for the lifetime of a process (each command/request). This satisfies the “memory-backed” requirement.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+file: Data is serialized to JSON under storage/app/ to demonstrate a simple persistence strategy and serialization format.
 
-## License
+If you switch repository types, rebuild autoload and clear config:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+composer dump-autoload -o
+php artisan config:clear
+
+## Commands
+Here are some examples for using the commands, more details about the flags can be found under console/commands
+
+# Media
+# Upload media (type title description source_url)
+    php artisan media:upload image "Cover" "Front Cover" https://example.com/cover.jpg
+    php artisan media:upload image "Cover" "Front Cover" https://example.com/cover.jpg --enrich
+
+# Search media
+    php artisan media:search --type=image --title=cover
+    php artisan media:search --type=image --title=cover --with-meta
+    php artisan media:search --type=image --title=cover --json
+
+# Enrich media (by UUID or all)
+    php artisan media:enrich <MEDIA_UUID>
+    php artisan media:enrich --all
+
+# Article
+# Create article (inline content)
+    php artisan article:create "My Headline" --content="Hello world"
+
+# Create article from Markdown file (placed a file at docs/sample.md)
+    php artisan article:create "Markdown Article" --content-file=docs/sample.md
+
+# Add media references
+    php artisan article:create "Photo Story" --image=UUID1 --image=UUID2
+    php artisan article:create "Video Piece" --attach=UUID3:video:label (repeatable)
+
+# Show article
+    php artisan article:show <ARTICLE_UUID>
+    php artisan article:show <ARTICLE_UUID> --resolve
+    php artisan article:show <ARTICLE_UUID> --resolve --json
+
+------------------------------------
+
+## Testing
+
+Unit tests cover:
+
+    - Media storage and validation
+
+    - Metadata enrichment logic
+
+    - Media resolution from article data
+
+    - Media entity immutability
+
+Simply use "php artisan test" to run all tests
+
+------------------------------------
+
+## Assumptions
+
+- No Eloquent or database is used. All domain logic is implemented with custom interfaces and repositories.
+
+- In-memory repositories are the default to match “memory-backed” behavior. Data does not persist between commands.
+
+- File-backed repositories are provided to demonstrate serialization and to ease manual testing across commands.
+
+- Metadata enrichment is handled by BasicMetadataService (e.g., source_host, file extension, checksum).
+
+- MediaResolverService resolves image_uuid_list and media_attachments to actual Media entities using the repository.
+
+- Service container bindings and PSR-4 autoloading are used. Services are injected via constructors.
