@@ -5,7 +5,7 @@ It focuses on Media Management and Article Integration with clear separation of 
 
 ------------------------------------
 
-## Requirements
+# Requirements
 
 - PHP 8.2+
 - Composer
@@ -13,7 +13,7 @@ It focuses on Media Management and Article Integration with clear separation of 
 
 ------------------------------------
 
-## Project Structure (key parts)
+# Project Structure (key parts)
 app/
     Domain/
         Media/ # Media entity, service, contracts, DTOs
@@ -32,14 +32,14 @@ tests/Unit/ # Unit tests for media and article
 
 ------------------------------------
 
-## Installation
+# Installation
 
 Once The project is cloned, run composer install and wait for the files to be generated.
 Afterwards, copy the .env.example as is and remove the .env, nothing should be changed unless wanting to move from memory repos to file repos
 
 ------------------------------------
 
-## Configuration
+# Configuration
 
 Repositories can be memory-backed (default, non-persistant) or file-backed for demo persistence.
 
@@ -53,7 +53,7 @@ ARTICLE_FILE_PATH=articles_store.json # only used when ARTICLE_REPOSITORY=file
 
 ------------------------------------
 
-## Notes:
+# Notes:
 
 memory: Data exists only for the lifetime of a process (each command/request). This satisfies the “memory-backed” requirement.
 
@@ -64,35 +64,35 @@ If you switch repository types, rebuild autoload and clear config:
 composer dump-autoload -o
 php artisan config:clear
 
-## Commands
+# Commands
 Here are some examples for using the commands, more details about the flags can be found under console/commands
 
-# Media
-# Upload media (type title description source_url)
+## Media
+## Upload media (type title description source_url)
     php artisan media:upload image "Cover" "Front Cover" https://example.com/cover.jpg
     php artisan media:upload image "Cover" "Front Cover" https://example.com/cover.jpg --enrich
 
-# Search media
+## Search media
     php artisan media:search --type=image --title=cover
     php artisan media:search --type=image --title=cover --with-meta
     php artisan media:search --type=image --title=cover --json
 
-# Enrich media (by UUID or all)
+## Enrich media (by UUID or all)
     php artisan media:enrich <MEDIA_UUID>
     php artisan media:enrich --all
 
-# Article
-# Create article (inline content)
+## Article
+## Create article (inline content)
     php artisan article:create "My Headline" --content="Hello world"
 
-# Create article from Markdown file (placed a file at docs/sample.md)
+## Create article from Markdown file (placed a file at docs/sample.md)
     php artisan article:create "Markdown Article" --content-file=docs/sample.md
 
-# Add media references
+## Add media references
     php artisan article:create "Photo Story" --image=UUID1 --image=UUID2
     php artisan article:create "Video Piece" --attach=UUID3:video:label (repeatable)
 
-# Show article
+## Show article
     php artisan article:show <ARTICLE_UUID>
     php artisan article:show <ARTICLE_UUID> --resolve
     php artisan article:show <ARTICLE_UUID> --resolve --json
