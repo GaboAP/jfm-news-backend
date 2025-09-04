@@ -17,10 +17,13 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withProviders([
-        App\Providers\MediaServiceProvider::class,   // ← add this
+        App\Providers\MediaServiceProvider::class,
+        App\Providers\ArticleServiceProvider::class,
     ])
     ->withCommands([
-        App\Console\Commands\UploadMedia::class,  // ← and these
+        App\Console\Commands\UploadMedia::class,
         App\Console\Commands\SearchMedia::class,
         App\Console\Commands\EnrichMedia::class,
+        App\Console\Commands\ShowArticle::class,
+        App\Console\Commands\CreateArticle::class,
     ])->create();

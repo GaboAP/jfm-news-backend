@@ -43,7 +43,7 @@ protected $signature = 'media:search
             return self::SUCCESS;
         }
 
-        // Full JSON mode (includes metadata, dates, etc.)
+        // Full JSON mode (includes metadata, etc, etc.)
         if ($this->option('json')) {
             $payload = array_map(fn($m) => $m->jsonSerialize(), $results);
             $this->line(json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
