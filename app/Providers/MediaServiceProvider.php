@@ -20,9 +20,11 @@ class MediaServiceProvider extends ServiceProvider
             MediaRepositoryInterface::class,
             InMemoryMediaRepository::class
         ); */
+        // Repo selection
+        $repo = config('media.repository', 'memory');
         $this->app->singleton(
             MediaRepositoryInterface::class,
-            FileMediaRepository::class
+            $repo === 'file' ? FileMediaRepository::class : InMemoryMediaRepository::class
         );
         $this->app->singleton(
             MediaValidatorInterface::class,

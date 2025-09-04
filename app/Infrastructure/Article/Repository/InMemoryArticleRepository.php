@@ -8,7 +8,7 @@ use App\Domain\Shared\ArticleId;
 
 final class InMemoryArticleRepository implements ArticleRepositoryInterface
 {
-    /** @var array<string, Article> */
+    /** @var array<string,Article> keyed by article_uuid */
     private array $store = [];
 
     public function save(Article $article): void
